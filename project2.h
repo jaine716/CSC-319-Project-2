@@ -81,4 +81,27 @@ double setScore(double pscore);
 
 //////////////////////////////////////////////PRINCIPALS///////////////////////////////////////////////////
 
+
+class Principals {
+    private:
+      int ordering;
+      string category;
+      string job;
+      string characters;
+    
+    public:
+
+    
+    Principals(string n, string t); //constructor
+    virtual ~Principals();          //destructor
+
+    void setPrinCharsActor(string n);
+
+    void setPrinCharsMovie(string t);
+
+    string getPrinCharsActor(string n);
+
+    string getPrinCharsMovie(string t);
+};
+
 ////////////////////////////////////////////////RATINGS////////////////////////////////////////////////////

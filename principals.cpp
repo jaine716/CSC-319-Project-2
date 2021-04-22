@@ -22,3 +22,32 @@ using namespace std;
 #include "project2.h"
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
+
+Principals::Principals(string n, string t){
+
+    nconst = n;
+    tconst = t;
+
+}
+
+Principals::~Principals(){}
+
+    void Principals::setPrinCharsActor(string a){
+        //setter
+        Actor = a;
+    }
+
+    void Principals::setPrinCharsMovie(string m){
+        //setter
+        movie = m;
+    }
+
+    string Principals::getPrinCharsActor(){
+        //getter
+        return Actor;
+    }
+
+    string Principals::getPrinCharsMovie(){
+        //getter
+        return movie;
+    } 
