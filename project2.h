@@ -59,7 +59,34 @@ public:
 };
 
 ////////////////////////////////////////////////MOVIE/////////////////////////////////////////////////////
-class Movie{
+class MovieTitle
+{
+
+    float getRating ();
+    void getPrincipals (object vector<Principals>MoviePrincipals);
+    void getAllActors (object vector<PersonName>ActorList);
+    private:
+        string primaryTitle;
+        string originalTitle;
+        object titleType;
+        bool isAdult;
+        object startYear;
+        object endYear;
+        string runtimesMinutes;
+        string genres;
+
+    protected:
+        float getRating;
+
+    public:
+        string tconst;
+        MovieTitle(string str);      //constructor prototype
+        virtual ~MovieTitle();       //destructor prototype
+
+};
+
+
+/*class Movie{
 
 private:
 string tconst;
@@ -77,7 +104,7 @@ string getID();
 void addActor( Person * p );
 double setScore(double pscore);
 
-};
+};*/
 
 //////////////////////////////////////////////PRINCIPALS///////////////////////////////////////////////////
 

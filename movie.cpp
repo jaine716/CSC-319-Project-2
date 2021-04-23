@@ -32,7 +32,24 @@ Movie::~Movie(){
 
 }
 
-void Movie::addActor( Person * p ){
+float MovieTitle::getRating ()
+{
+                
+}
+
+void MovieTitle::getPrincipals (object vector<Principals>MoviePrincipals)
+{
+                
+}
+
+void MovieTitle::getAllActors (object vector<PersonName>ActorList)
+{
+                
+}
+
+
+
+/*void Movie::addActor( Person * p ){
     actorList.push_back( p );
 }
 
@@ -42,5 +59,5 @@ string Movie::getID(){
 
 double Movie::setScore(double pscore){
     this->score = pscore;
-}
+}*/
 
