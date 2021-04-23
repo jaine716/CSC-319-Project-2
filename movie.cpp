@@ -23,41 +23,38 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-Movie::Movie(string str){
+MovieTitle::MovieTitle(string str){
     tconst = str;
     //should recieve more info here...
 }
 
-Movie::~Movie(){
+MovieTitle::~MovieTitle(){
 
 }
 
-float MovieTitle::getRating ()
+double MovieTitle::getRating()
 {
                 
 }
 
-void MovieTitle::getPrincipals (object vector<Principals>MoviePrincipals)
-{
-                
+void MovieTitle::getPrincipals (Principals * prin){   
+    principalList.push_back(prin);            
 }
 
-void MovieTitle::getAllActors (object vector<PersonName>ActorList)
-{
-                
+void MovieTitle::getAllActors (Person * actor){
+     actorList.push_back(actor);           
 }
 
 
-
-/*void Movie::addActor( Person * p ){
+void MovieTitle::addActor( Person * p ){
     actorList.push_back( p );
 }
 
-string Movie::getID(){
+string MovieTitle::getID(){
         return tconst;
     }
 
-double Movie::setScore(double pscore){
+double MovieTitle::setScore(double pscore){
     this->score = pscore;
-}*/
+}
 

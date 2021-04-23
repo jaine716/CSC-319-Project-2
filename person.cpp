@@ -36,7 +36,7 @@ string Person::getID(){
         return nconst;
     }
 
-void Person::addTitle( Movie * m ) {
+void Person::addTitle( MovieTitle * m ) {
         titleList.push_back(m);
     }
 
@@ -44,7 +44,7 @@ void Person::addToAppearsWith(Person * p){
         appearsWithList.push_back(p);
     }
 
-void Person::addToKnownForList(Movie * m){
+void Person::addToKnownForList(MovieTitle * m){
         knownForList.push_back(m);
     }
 

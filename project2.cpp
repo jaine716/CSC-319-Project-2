@@ -24,7 +24,7 @@ using namespace std;
 #include "project2.h"
 
 map<string, Person *> mapPersons;       //map of persons
-map<string, Movie *> mapMovies;         //map of movies
+map<string, MovieTitle *> mapMovies;         //map of movies
 
 /////////////////////////////////////////////MAIN///////////////////////////////////////////////////////////////////
 int main(){
@@ -64,13 +64,13 @@ double calculateScore(string id){
 }
 
 /////////////////////////////////////////LOADING THE DATA////////////////////////////////////////////////////////////////
-/*
+
 void loadMovie(istream & is){
     char buf[255];                  //a literal must end with binary zero
     while(is.getline(buf, 255)){    //read data from file object and put it into string
         string str(buf);
-        Movie * m = new Movie( str );
-        mapMovies.insert( pair<string, Movie *> (m->getID(), m));
+        MovieTitle * m = new MovieTitle( str );
+        mapMovies.insert( pair<string, MovieTitle *> (m->getID(), m));
     }
 }
 
@@ -100,7 +100,7 @@ void loadPrincipal(istream & is){
         auto itFindMovie = mapMovies.find( mId );
 
         string str2 = itFindMovie->first;       //1st component of pair
-        Movie * m = itFindMovie->second;        //2nd component of pair
+        MovieTitle * m = itFindMovie->second;        //2nd component of pair
 
         if ( p != nullptr && m != nullptr ){
             p->addTitle( m );
@@ -129,5 +129,5 @@ void loadDataSet(){
     loadPrincipal( isPrincipal );
 
 }
-*/
+
 

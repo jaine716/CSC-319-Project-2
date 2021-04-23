@@ -28,9 +28,9 @@ void loadPrincipal(istream & is);       //load principals
 double calculateScore(string id);       //calculate score of actor
 
 //class prototypes
-class Movie;
+class MovieTitle;
 class Person;
-class Principal;
+class Principals;
 class Rating;
 
 /////////////////////////////////////////////PERSON//////////////////////////////////////////////////////
@@ -42,9 +42,9 @@ private:
 
     string primaryProfession[3];        //top 3 primary professions of person (array)
 
-    vector<Movie *> titleList;          //list of movies they appear in
+    vector<MovieTitle *> titleList;          //list of movies they appear in
     vector<Person *> appearsWithList;   //list of people who appear with them  in other movies
-    vector<Movie *> knownForList;       //list of movies they are known for
+    vector<MovieTitle *> knownForList;       //list of movies they are known for
 
 public:
     Person(string str);     //constructor prototype
@@ -52,9 +52,9 @@ public:
 
     //function prototypes
     string getID();         
-    void addTitle( Movie * m );
+    void addTitle( MovieTitle * m );
     void addToAppearsWith(Person * p);
-    void addToKnownForList(Movie * m);
+    void addToKnownForList(MovieTitle * m);
 
 };
 
@@ -62,26 +62,37 @@ public:
 class MovieTitle
 {
 
-    float getRating ();
-    void getPrincipals (object vector<Principals>MoviePrincipals);
-    void getAllActors (object vector<PersonName>ActorList);
+
     private:
+        string tconst;
+        double score = 0.0;
         string primaryTitle;
         string originalTitle;
-        object titleType;
+        string titleType;
         bool isAdult;
-        object startYear;
-        object endYear;
+        string startYear;
+        string endYear;
         string runtimesMinutes;
         string genres;
+        vector<Principals *> principalList;
+        vector<Person *> actorList;
 
     protected:
-        float getRating;
+      
 
     public:
-        string tconst;
+        
         MovieTitle(string str);      //constructor prototype
         virtual ~MovieTitle();       //destructor prototype
+
+        double getRating ();
+        
+        void getPrincipals (Principals * prin);
+        void getAllActors (Person * actor);
+    
+        string getID();
+        void addActor( Person * p );
+        double setScore(double pscore);
 
 };
 
@@ -111,6 +122,8 @@ double setScore(double pscore);
 
 class Principals {
     private:
+      string nconst;
+      string tconst;
       int ordering;
       string category;
       string job;

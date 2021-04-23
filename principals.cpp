@@ -32,22 +32,23 @@ Principals::Principals(string n, string t){
 
 Principals::~Principals(){}
 
-    void Principals::setPrinCharsActor(string a){
+    void Principals::setPrinCharsActor(string n){
         //setter
-        Actor = a;
+        //Actor = a;
     }
 
-    void Principals::setPrinCharsMovie(string m){
+    void Principals::setPrinCharsMovie(string t){
         //setter
-        movie = m;
+        //movie = m;
     }
 
-    string Principals::getPrinCharsActor(){
+    string Principals::getPrinCharsActor(string n){
         //getter
-        return Actor;
+        //return Actor;
     }
 
-    string Principals::getPrinCharsMovie(){
+    string Principals::getPrinCharsMovie(string t){
         //getter
-        return movie;
+        //return movie;
     } 
+    
