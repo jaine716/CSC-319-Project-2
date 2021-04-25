@@ -28,9 +28,23 @@ Person:: Person(string str){     //constructor
             //...recieve more information?
         }
 
+Person:: Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor){       //constructor
+    nconst = pId;
+    primaryName = pName;
+    birthYear = bYear;
+    deathYear = dYear;
+    primaryProfession = pProf;
+    knownForTitles = knownFor;
+}
+
 Person::~Person(){      //destructor
 
     }
+
+void Person::write(ostream& perStrm){	//used by operator overload for <<
+	
+	perStrm << nconst << " | " << primaryName << " | " << birthYear << " | " << deathYear << " | " << primaryProfession << " | " << knownForTitles << endl;
+}
 
 string Person::getID(){
         return nconst;

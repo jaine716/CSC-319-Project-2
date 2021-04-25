@@ -12,16 +12,24 @@
 #include <memory>
 #include <fstream>   //to do file input & output
 #include <iomanip>  // io formatting
+//#include <boost/algorithm/string.hpp>
 
 using std::cout;
 using std::endl;
 using std::ostream;
 using std::istringstream;
 using std::istream;
+//using namespace boost::algorithm
 
 using namespace std;
 
 #include "project2.h"
+
+/*******insert the addresses of the data files on your local machine here:*********/
+#define MOVIE_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/title.tsv"
+#define PERSON_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/name.tsv"
+#define PRINCIPAL_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/principals.tsv"
+#define RATING_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/ratings.tsv"
 
 map<string, Person *> mapPersons;       //map of persons
 map<string, MovieTitle *> mapMovies;         //map of movies
@@ -32,22 +40,22 @@ int main(){
     // main body of program here
 
     string id;
-    double score;
+    double score = 0;
 
-    //loadDataSet();        //un-comment to load data set
+    loadDataSet();        //un-comment to load data set
 
     /*Command line: Project2 <name input filename> <title input filename> <principals input filename> 
             <ratings input filename> <score output filename> <person Id= nconst > <level of indirection>*/
 
     //below is temporary
     cout << "---------------Project #2---------------" << endl;
-    cout << "Enter unique identifier of actor: ";
+  /*  cout << "Enter unique identifier of actor: ";
     cin >> id;
 
     score = calculateScore(id);
 
     cout << "The score for this actor is: " << score << endl;
-
+*/
     /*Producing the output:
 
     1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
@@ -64,69 +72,167 @@ double calculateScore(string id){
 }
 
 /////////////////////////////////////////LOADING THE DATA////////////////////////////////////////////////////////////////
+void loadMovie(){
+    ifstream inFile;
+    vector<string> result;
+    string cell;
+    string tId, tType, pTitle, oTitle, isAd, sYear, eYear, rtMin, genr;
 
-void loadMovie(istream & is){
-    char buf[255];                  //a literal must end with binary zero
-    while(is.getline(buf, 255)){    //read data from file object and put it into string
-        string str(buf);
-        MovieTitle * m = new MovieTitle( str );
-        mapMovies.insert( pair<string, MovieTitle *> (m->getID(), m));
-    }
+	inFile.open(MOVIE_FILE);
+
+    if ( inFile.is_open() ) {
+		char buf[255]; //a literal must end by a binary zero '\0'
+		while( inFile.getline(buf, 255) ){ //read data from file object and put it into string.
+            string str(buf);
+            istringstream strstrm(str);
+           
+           //create a vector of tab-delimeted strings for each line of the file
+            while(getline(strstrm, cell, '\t')){
+                result.push_back(cell);
+            }
+
+            //extract values from each element of the vector and assign them to individual class members
+            tId = result.at(0);
+            tType = result.at(1);
+            pTitle = result.at(2);
+            oTitle = result.at(3);
+            isAd = result.at(4);
+            sYear = result.at(5);
+            eYear = result.at(6);
+            rtMin = result.at(7);
+            genr = result.at(8);
+
+            //create new object m (class Movie)
+            MovieTitle * m = new MovieTitle(tId, tType, pTitle, oTitle, isAd, sYear, eYear, rtMin, genr);
+            //create map of movies and movie IDs (tconst)
+            mapMovies.insert( pair<string, MovieTitle *> (m->getID(), m));
+
+            //print object m and all of it's elements
+            cout << *m;
+            cout << "-------" << endl;
+            result.clear();
+            
+		}
+
+		inFile.close();
+        
+        //print map of values
+     /*   for(auto it = mapMovies.begin(); it != mapMovies.end(); ++it){
+            cout << it->first << " * " << it->second << endl;
+        }   */
+	}
+
 }
 
-void loadPerson(istream & is){
-    char buf[255];                  //a literal must end with binary zero
-    while(is.getline(buf, 255)){    //read data from file object and put it into string
-        string str(buf);
-        Person * p = new Person( str );
-        mapPersons.insert( pair<string, Person *> (p->getID(), p));
-    }
+void loadPerson(){
+    ifstream inFile;
+    vector<string> result;
+    string cell;
+    string pId, pName, bYear, dYear, pProf, knownFor;
+
+	inFile.open(PERSON_FILE);
+
+    if ( inFile.is_open() ) {
+		char buf[255]; //a literal must end by a binary zero '\0'
+		while( inFile.getline(buf, 255) ){ //read data from file object and put it into string.
+            string str(buf);
+            istringstream strstrm(str);
+           
+           //create a vector of tab-delimeted strings for each line of the file
+            while(getline(strstrm, cell, '\t')){
+                result.push_back(cell);
+            }
+
+            //extract values and assign them to class members
+            pId = result.at(0);
+            pName = result.at(1);
+            bYear = result.at(2);
+            dYear = result.at(3);
+            pProf = result.at(4);
+            knownFor = result.at(5); 
+
+            //create new Person object
+            Person * p = new Person(pId, pName, bYear, dYear, pProf, knownFor);
+            mapPersons.insert( pair<string, Person *> (p->getID(), p));
+
+            //print object p and all of it's elements
+            cout << *p;
+            cout << "-------" << endl;
+            result.clear();
+            
+		}
+
+		inFile.close();
+
+        //print map of values
+    /*    for(auto it = mapPersons.begin(); it != mapPersons.end(); ++it){
+            cout << it->first << " * " << it->second << endl;
+        }   */
+	}
 }
 
-void loadPrincipal(istream & is){
-    char buf[255];                  //a literal must end with binary zero
-    while(is.getline(buf, 255)){    //read data from file object and put it into string
-        string str(buf);
+void loadPrincipal(){
+    ifstream inFile;
+    vector<string> result;
+    string cell;
+    string t, order, n, cat, jb, chars;
 
-        //...hard code length... for demo purposes only
-        string mId = str.substr(0,1);
-        string pId = str.substr(2,3);
+	inFile.open(PRINCIPAL_FILE);
 
-        auto itFindPerson = mapPersons.find(pId);
+    if ( inFile.is_open() ) {
+		char buf[255]; //a literal must end by a binary zero '\0'
+		while( inFile.getline(buf, 255) ){ //read data from file object and put it into string.
+            string str(buf);
+            istringstream strstrm(str);
+           
+        //create a vector of tab-delimeted strings for each line of the file
+        while(getline(strstrm, cell, '\t')){
+            result.push_back(cell);
+        }
+        
+        t = result.at(0);
+        order = result.at(1);
+        n = result.at(2);
+        cat = result.at(3);
+        jb = result.at(4);
+        chars = result.at(5);
+
+        Principals * pr = new Principals(t, order, n, cat, jb, chars);
+
+        auto itFindPerson = mapPersons.find(n);
 
         string str1 = itFindPerson->first;      //1st component of the pair
         Person * p = itFindPerson->second;      //2nd component of the pair
 
-        auto itFindMovie = mapMovies.find( mId );
+        auto itFindMovie = mapMovies.find(t);
 
         string str2 = itFindMovie->first;       //1st component of pair
-        MovieTitle * m = itFindMovie->second;        //2nd component of pair
+        MovieTitle * m = itFindMovie->second;   //2nd component of pair
 
         if ( p != nullptr && m != nullptr ){
             p->addTitle( m );
             m->addActor( p );
         }
+
+        //print out list of principals
+        cout << *pr << endl;
+        cout << "-------" << endl;
+        result.clear();
     
-    }
+        } //endwhile
+
+        inFile.close();
+    } //endif
 }
 
 
 void loadDataSet(){
 
-    string testMovieData( "1\n2\n");
-    istringstream isMovie( testMovieData);
+    loadMovie();
 
-    loadMovie( isMovie );
+    loadPerson();
 
-    string testPersonData( "100\n200\n");
-    istringstream isPerson( testPersonData);
-
-    loadPerson( isPerson);
-
-    string testPrincipalData("1,100\n1,200\n2,100\n");
-    istringstream isPrincipal( testPrincipalData );
-
-    loadPrincipal( isPrincipal );
+    loadPrincipal();
 
 }
 

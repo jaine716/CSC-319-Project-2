@@ -23,32 +23,41 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-Principals::Principals(string n, string t){
+Principals::Principals(string t, string order, string n, string cat, string jb, string chars){      //constructor
 
-    nconst = n;
     tconst = t;
+    ordering = order;
+    nconst = n;
+    category = cat;
+    job = jb;
+    characters = chars;
 
 }
 
-Principals::~Principals(){}
+void Principals::write(ostream& prinStrm){	    //used for operator overload for <<
+	
+	prinStrm << tconst << " | " << ordering << " | " << nconst << " | " << category << " | " << job << " | " << characters << endl;
+}
 
-    void Principals::setPrinCharsActor(string n){
-        //setter
-        //Actor = a;
-    }
+Principals::~Principals(){}         //destructor
 
-    void Principals::setPrinCharsMovie(string t){
-        //setter
-        //movie = m;
-    }
+void Principals::setPrinCharsActor(string n){
+    //setter
+    //Actor = a;
+}
 
-    string Principals::getPrinCharsActor(string n){
-        //getter
-        //return Actor;
-    }
+void Principals::setPrinCharsMovie(string t){
+    //setter
+    //movie = m;
+}
 
-    string Principals::getPrinCharsMovie(string t){
-        //getter
-        //return movie;
-    } 
+string Principals::getPrinCharsActor(string n){
+    //getter
+    return nconst;
+}
+
+string Principals::getPrinCharsMovie(string t){
+    //getter
+    return tconst;
+} 
     
