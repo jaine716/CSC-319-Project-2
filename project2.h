@@ -39,8 +39,11 @@ class Person{
 private:
     string nconst;                      //unique person identifier
     string primaryName;                 //name of person
+    string birthYear;
+    string deathYear;
 
-    string primaryProfession[3];        //top 3 primary professions of person (array)
+    string knownForTitles;
+    string primaryProfession;        //top 3 primary professions of person (array)
 
     vector<MovieTitle *> titleList;          //list of movies they appear in
     vector<Person *> appearsWithList;   //list of people who appear with them  in other movies
@@ -48,9 +51,18 @@ private:
 
 public:
     Person(string str);     //constructor prototype
+    Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor);
     virtual ~Person();      //destructor prototype
 
+    friend ostream& operator<< (ostream&perStrm, Person obj){		//operator overload for <<
+	   	obj.write(perStrm);
+	    return perStrm;
+	}
+
+        
     //function prototypes
+    void write(ostream& movStrm);
+
     string getID();         
     void addTitle( MovieTitle * m );
     void addToAppearsWith(Person * p);
@@ -69,7 +81,7 @@ class MovieTitle
         string primaryTitle;
         string originalTitle;
         string titleType;
-        bool isAdult;
+        string isAdult;
         string startYear;
         string endYear;
         string runtimesMinutes;
@@ -83,7 +95,16 @@ class MovieTitle
     public:
         
         MovieTitle(string str);      //constructor prototype
+        MovieTitle(string tId, string tType, string pTitle, string oTitle, string isAd, string sYear, string eYear, string rtMin, string genr);
         virtual ~MovieTitle();       //destructor prototype
+
+        
+        friend ostream& operator<< (ostream&movStrm, MovieTitle obj){		//operator overload for <<
+	    	obj.write(movStrm);
+		    return movStrm;
+	    }
+
+        void write(ostream& movStrm);
 
         double getRating ();
         
@@ -124,7 +145,7 @@ class Principals {
     private:
       string nconst;
       string tconst;
-      int ordering;
+      string ordering;
       string category;
       string job;
       string characters;
@@ -133,7 +154,15 @@ class Principals {
 
     
     Principals(string n, string t); //constructor
+    Principals(string t, string order, string n, string cat, string jb, string chars);
     virtual ~Principals();          //destructor
+
+    friend ostream& operator<< (ostream&prinStrm, Principals obj){		//operator overload for <<
+	   	obj.write(prinStrm);
+	    return prinStrm;
+	}
+
+    void write(ostream& prinStrm);
 
     void setPrinCharsActor(string n);
 
