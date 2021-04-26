@@ -27,6 +27,11 @@ Rating::Rating(string tId, string avgR, string nVotes){
     averageRating = avgR;
     numVotes = nVotes;
 }
-Rating::~Rating(){
 
+Rating::~Rating(){
+}
+
+void Rating::write(ostream& rateStrm){	//used by operator overload for <<
+	
+	rateStrm << tconst << " | " << averageRating << " | " << numVotes << " | " << endl;
 }

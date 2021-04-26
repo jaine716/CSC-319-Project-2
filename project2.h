@@ -170,4 +170,12 @@ public:
 
     Rating(string tId, string avgR, string nVotes);
     ~Rating();
+
+    void write(ostream& rateStrm);
+
+    // << operator overload
+    friend ostream& operator<< (ostream&rateStrm, Rating obj){		//friend means you can access the private members of the class
+    	obj.write(rateStrm);
+		return rateStrm;
+	}
 };

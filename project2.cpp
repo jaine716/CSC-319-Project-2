@@ -225,6 +225,43 @@ void loadPrincipal(){
     } //endif
 }
 
+void loadRatings(){
+        ifstream inFile;
+    vector<string> result;
+    string cell;
+    string tId, avgR, nVotes;
+
+	inFile.open(RATING_FILE);
+
+    if ( inFile.is_open() ) {
+		char buf[255]; //a literal must end by a binary zero '\0'
+		while( inFile.getline(buf, 255) ){ //read data from file object and put it into string.
+            string str(buf);
+            istringstream strstrm(str);
+           
+           //create a vector of tab-delimeted strings for each line of the file
+            while(getline(strstrm, cell, '\t')){
+                result.push_back(cell);
+            }
+
+            //extract values and assign them to class members
+            tId = result.at(0);
+            avgR = result.at(1);
+            nVotes = result.at(2);
+            
+            //create new Person object
+            Rating * r = new Rating(tId, avgR, nVotes);
+            
+
+            //print object p and all of it's elements
+            cout << *r;
+            cout << "-------" << endl;
+            result.clear();
+            
+		}
+		inFile.close();
+	}
+}
 
 void loadDataSet(){
 
@@ -234,6 +271,7 @@ void loadDataSet(){
 
     loadPrincipal();
 
+    loadRatings();
 }
 
 
