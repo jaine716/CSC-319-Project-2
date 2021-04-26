@@ -158,3 +158,16 @@ class Principals {
 };
 
 ////////////////////////////////////////////////RATINGS////////////////////////////////////////////////////
+
+class Rating{
+
+private:
+    string tconst;
+    string averageRating;
+    string numVotes;
+
+public:
+
+    Rating(string tId, string avgR, string nVotes);
+    ~Rating();
+};

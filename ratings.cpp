@@ -22,3 +22,11 @@ using namespace std;
 #include "project2.h"
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
+Rating::Rating(string tId, string avgR, string nVotes){
+    tconst = tId;
+    averageRating = avgR;
+    numVotes = nVotes;
+}
+Rating::~Rating(){
+
+}
