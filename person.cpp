@@ -23,12 +23,7 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-Person:: Person(string str){     //constructor
-            nconst = str;
-            //...recieve more information?
-        }
-
-Person:: Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor){       //constructor
+Person::Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor){       //constructor
     nconst = pId;
     primaryName = pName;
     birthYear = bYear;
@@ -39,7 +34,7 @@ Person:: Person(string pId, string pName, string bYear, string dYear, string pPr
 
 Person::~Person(){      //destructor
 
-    }
+}
 
 void Person::write(ostream& perStrm){	//used by operator overload for <<
 	

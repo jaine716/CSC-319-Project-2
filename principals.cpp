@@ -41,23 +41,52 @@ void Principals::write(ostream& prinStrm){	    //used for operator overload for 
 
 Principals::~Principals(){}         //destructor
 
-void Principals::setPrinCharsActor(string n){
+void Principals::setNconst(string n){
     //setter
-    //Actor = a;
+    nconst = n;
 }
 
-void Principals::setPrinCharsMovie(string t){
+void Principals::setTconst(string t){
     //setter
-    //movie = m;
+    tconst = t;
 }
 
-string Principals::getPrinCharsActor(string n){
+void Principals::setCategory(string c){   
+    //setter
+    category = c;
+}
+
+string Principals::getNconst(){
     //getter
     return nconst;
 }
 
-string Principals::getPrinCharsMovie(string t){
+string Principals::getTconst(){
     //getter
     return tconst;
 } 
-    
+
+string Principals::getCategory(){
+    //getter
+    return category;
+} 
+
+void Principals::addPrincipal(Principals * principal){
+    principalslist.push_back(principal);
+} 
+
+string Principals::getPrinCharsActors(string nconst){
+ /*   for (int x = 0; x >= principalslist.size(); ++x)
+    {
+        if (nconst.compare(&principalslist[x].getNconst()))
+        {
+            cout<<&principalslist[x].getNconst()<<endl;
+        }
+        
+    }
+    */
+}
+
+string Principals::getPrinCharsMovies(string tconst){
+    //copy paste above once working for tconst
+}

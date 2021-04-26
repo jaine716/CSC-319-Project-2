@@ -23,12 +23,6 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-MovieTitle::MovieTitle(string str){
-    tconst = str;
-    
-
-}
-
 MovieTitle::MovieTitle(string tId, string tType, string pTitle, string oTitle, string isAd, string sYear, string eYear, string rtMin, string genr){
 
     tconst = tId;
@@ -58,11 +52,11 @@ double MovieTitle::getRating()
 }
 
 void MovieTitle::getPrincipals (Principals * prin){   
-    principalList.push_back(prin);            
+    //principalList.push_back(prin);            
 }
 
 void MovieTitle::getAllActors (Person * actor){
-     actorList.push_back(actor);           
+     //actorList.push_back(actor);           
 }
 
 
