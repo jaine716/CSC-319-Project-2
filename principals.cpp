@@ -23,32 +23,70 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-Principals::Principals(string n, string t){
+Principals::Principals(string t, string order, string n, string cat, string jb, string chars){      //constructor
 
-    nconst = n;
     tconst = t;
+    ordering = order;
+    nconst = n;
+    category = cat;
+    job = jb;
+    characters = chars;
 
 }
 
-Principals::~Principals(){}
+void Principals::write(ostream& prinStrm){	    //used for operator overload for <<
+	
+	prinStrm << tconst << " | " << ordering << " | " << nconst << " | " << category << " | " << job << " | " << characters << endl;
+}
 
-    void Principals::setPrinCharsActor(string n){
-        //setter
-        //Actor = a;
+Principals::~Principals(){}         //destructor
+
+void Principals::setNconst(string n){
+    //setter
+    nconst = n;
+}
+
+void Principals::setTconst(string t){
+    //setter
+    tconst = t;
+}
+
+void Principals::setCategory(string c){   
+    //setter
+    category = c;
+}
+
+string Principals::getNconst(){
+    //getter
+    return nconst;
+}
+
+string Principals::getTconst(){
+    //getter
+    return tconst;
+} 
+
+string Principals::getCategory(){
+    //getter
+    return category;
+} 
+
+void Principals::addPrincipal(Principals * principal){
+    principalslist.push_back(principal);
+} 
+
+string Principals::getPrinCharsActors(string nconst){
+ /*   for (int x = 0; x >= principalslist.size(); ++x)
+    {
+        if (nconst.compare(&principalslist[x].getNconst()))
+        {
+            cout<<&principalslist[x].getNconst()<<endl;
+        }
+        
     }
+    */
+}
 
-    void Principals::setPrinCharsMovie(string t){
-        //setter
-        //movie = m;
-    }
-
-    string Principals::getPrinCharsActor(string n){
-        //getter
-        //return Actor;
-    }
-
-    string Principals::getPrinCharsMovie(string t){
-        //getter
-        //return movie;
-    } 
-    
+string Principals::getPrinCharsMovies(string tconst){
+    //copy paste above once working for tconst
+}

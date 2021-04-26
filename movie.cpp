@@ -23,9 +23,23 @@ using namespace std;
 
 //Put member functions, constructors, destructors, copy constructors, copy-assignment operators, etc. in here
 
-MovieTitle::MovieTitle(string str){
-    tconst = str;
-    //should recieve more info here...
+MovieTitle::MovieTitle(string tId, string tType, string pTitle, string oTitle, string isAd, string sYear, string eYear, string rtMin, string genr){
+
+    tconst = tId;
+    titleType = tType;
+    primaryTitle = pTitle;
+    originalTitle = oTitle;
+    isAdult = isAd;
+    startYear = sYear;
+    endYear = eYear;
+    runtimesMinutes = rtMin;
+    genres = genr;
+
+}
+
+void MovieTitle::write(ostream& movStrm){	    //used for operator overload for <<
+	
+	movStrm << tconst << " | " << titleType << " | " << primaryTitle << " | " << originalTitle << " | " << isAdult << " | " << startYear << " | " << endYear << " | " << runtimesMinutes << " | " << genres << endl;
 }
 
 MovieTitle::~MovieTitle(){
@@ -38,11 +52,11 @@ double MovieTitle::getRating()
 }
 
 void MovieTitle::getPrincipals (Principals * prin){   
-    principalList.push_back(prin);            
+    //principalList.push_back(prin);            
 }
 
 void MovieTitle::getAllActors (Person * actor){
-     actorList.push_back(actor);           
+     //actorList.push_back(actor);           
 }
 
 

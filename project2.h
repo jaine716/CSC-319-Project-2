@@ -21,9 +21,9 @@ using namespace std;
 //function prototypes
 void loadDataSet();                     //load the data set
 
-void loadMovie(istream & is);           //load movies
-void loadPerson(istream & is);          //load people
-void loadPrincipal(istream & is);       //load principals
+void loadMovie();           //load movies
+void loadPerson();          //load people
+void loadPrincipal();       //load principals
 
 double calculateScore(string id);       //calculate score of actor
 
@@ -37,20 +37,31 @@ class Rating;
 class Person{
 
 private:
-    string nconst;                      //unique person identifier
-    string primaryName;                 //name of person
+    string nconst;                              //unique person identifier
+    string primaryName;
+    string birthYear;
+    string deathYear;
+    string primaryProfession;
+    string knownForTitles;
 
-    string primaryProfession[3];        //top 3 primary professions of person (array)
-
-    vector<MovieTitle *> titleList;          //list of movies they appear in
-    vector<Person *> appearsWithList;   //list of people who appear with them  in other movies
-    vector<MovieTitle *> knownForList;       //list of movies they are known for
+    vector<MovieTitle *> titleList;             //list of movies they appear in
+    vector<Person *> appearsWithList;           //list of people who appear with them  in other movies
+    vector<MovieTitle *> knownForList;          //list of movies they are known for
 
 public:
-    Person(string str);     //constructor prototype
+    
+    Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor);    //constructor prototype
     virtual ~Person();      //destructor prototype
 
     //function prototypes
+    void write(ostream& perStrm);
+
+    friend ostream& operator<< (ostream&perStrm, Person obj){		//friend means you can access the private members of the class
+
+		obj.write(perStrm);
+		return perStrm;
+	}
+
     string getID();         
     void addTitle( MovieTitle * m );
     void addToAppearsWith(Person * p);
@@ -61,19 +72,18 @@ public:
 ////////////////////////////////////////////////MOVIE/////////////////////////////////////////////////////
 class MovieTitle
 {
-
-
     private:
         string tconst;
-        double score = 0.0;
         string primaryTitle;
         string originalTitle;
         string titleType;
-        bool isAdult;
+        string isAdult;
         string startYear;
         string endYear;
         string runtimesMinutes;
         string genres;
+
+        double score = 0.0;
         vector<Principals *> principalList;
         vector<Person *> actorList;
 
@@ -82,40 +92,26 @@ class MovieTitle
 
     public:
         
-        MovieTitle(string str);      //constructor prototype
+        //constructor prototype
+        MovieTitle(string tId, string tType, string pTitle, string oTitle, string isAd, string sYear, string eYear, string rtMin, string genr);
         virtual ~MovieTitle();       //destructor prototype
 
+        void write(ostream& movStrm);
+        friend ostream& operator<< (ostream&movStrm, MovieTitle obj){		//friend means you can access the private members of the class
+
+		obj.write(movStrm);
+		return movStrm;
+	}
+        string getID();
         double getRating ();
         
         void getPrincipals (Principals * prin);
         void getAllActors (Person * actor);
-    
-        string getID();
+       
         void addActor( Person * p );
         double setScore(double pscore);
 
 };
-
-
-/*class Movie{
-
-private:
-string tconst;
-double score = 0.0;
-int year;
-vector<Person *> actorList;
-
-public:
-
-Movie(string str);      //constructor prototype
-virtual ~Movie();       //destructor prototype
-
-//function prototypes
-string getID();
-void addActor( Person * p );
-double setScore(double pscore);
-
-};*/
 
 //////////////////////////////////////////////PRINCIPALS///////////////////////////////////////////////////
 
@@ -124,24 +120,54 @@ class Principals {
     private:
       string nconst;
       string tconst;
-      int ordering;
+      string ordering;
       string category;
       string job;
       string characters;
+      vector<Principals *> principalslist;
     
     public:
 
-    
-    Principals(string n, string t); //constructor
+    Principals(string t, string order, string n, string cat, string jb, string chars);      //constructor
     virtual ~Principals();          //destructor
 
-    void setPrinCharsActor(string n);
 
+    void write(ostream& prinStrm);
+
+    // << operator overload
+    friend ostream& operator<< (ostream&prinStrm, Principals obj){		//friend means you can access the private members of the class
+    	obj.write(prinStrm);
+		return prinStrm;
+	}
+
+    void setPrinCharsActor(string n);
     void setPrinCharsMovie(string t);
 
-    string getPrinCharsActor(string n);
+    void setNconst(string n);
+    void setTconst(string t);
+    void setCategory(string c);
 
-    string getPrinCharsMovie(string t);
+    string getNconst();
+    string getTconst();
+    string getCategory();
+
+    void addPrincipal(Principals * principal);
+
+    string getPrinCharsActors(string nconst);
+    string getPrinCharsMovies(string tconst);
 };
 
 ////////////////////////////////////////////////RATINGS////////////////////////////////////////////////////
+
+class Rating{
+
+private:
+    string tconst;
+    string averageRating;
+    string numVotes;
+
+public:
+
+    Rating(string tId, string avgR, string nVotes);
+    ~Rating();
+};
