@@ -35,3 +35,12 @@ void Rating::write(ostream& rateStrm){	//used by operator overload for <<
 	
 	rateStrm << tconst << " | " << averageRating << " | " << numVotes << " | " << endl;
 }
+
+
+void Rating::setRating(string r){
+    averageRating = r;
+}
+
+string Rating::getRating(){
+    return averageRating;
+}

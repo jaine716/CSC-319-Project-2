@@ -178,4 +178,7 @@ public:
     	obj.write(rateStrm);
 		return rateStrm;
 	}
+
+        void setRating(string r);
+        string getRating();
 };
