@@ -44,10 +44,28 @@ void Person::write(ostream& perStrm){	//used by operator overload for <<
 string Person::getID(){
         return nconst;
     }
+string Person::getPrimaryName(){
+    return primaryName;
+}
 
-void Person::addTitle( MovieTitle * m ) {
-        titleList.push_back(m);
-    }
+vector<string> Person::addTitleList() {
+
+        string titlestr = this->knownForTitles;
+        istringstream strstrm(titlestr);
+        string cell;
+
+        while(getline(strstrm, cell, ',')){
+
+            titleListStr.push_back(cell);
+            //cout << cell << " ";
+        }
+        
+    return titleListStr;
+}
+
+void Person::addTitle(MovieTitle * m) {
+    titleList.push_back(m);
+}
 
 void Person::addToAppearsWith(Person * p){
         appearsWithList.push_back(p);

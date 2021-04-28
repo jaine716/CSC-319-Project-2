@@ -50,6 +50,15 @@ double MovieTitle::getRating()
 {
                 
 }
+string MovieTitle::getTitle(){
+
+    return primaryTitle;
+}
+
+MovieTitle* MovieTitle::getAddress(){
+    
+    return this;
+}
 
 void MovieTitle::getPrincipals (Principals * prin){   
     //principalList.push_back(prin);            

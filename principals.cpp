@@ -75,16 +75,16 @@ void Principals::addPrincipal(Principals * principal){
     principalslist.push_back(principal);
 } 
 
-string Principals::getPrinCharsActors(string nconst){
- /*   for (int x = 0; x >= principalslist.size(); ++x)
+string Principals::getPrinCharsActors(string n){
+/*    for (int x = 0; x >= principalslist.size(); ++x)
     {
-        if (nconst.compare(&principalslist[x].getNconst()))
+        if (n.compare(&principalslist[x]->getNconst() == nconst))
         {
-            cout<<&principalslist[x].getNconst()<<endl;
+            cout<<&principalslist[x]->getNconst()<<endl;
         }
         
     }
-    */
+ */   
 }
 
 string Principals::getPrinCharsMovies(string tconst){

@@ -18,6 +18,13 @@ using std::istream;
 
 using namespace std;
 
+//class prototypes
+class MovieTitle;
+class Person;
+class Principals;
+class Rating;
+
+
 //function prototypes
 void loadDataSet();                     //load the data set
 
@@ -27,11 +34,8 @@ void loadPrincipal();       //load principals
 
 double calculateScore(string id);       //calculate score of actor
 
-//class prototypes
-class MovieTitle;
-class Person;
-class Principals;
-class Rating;
+vector<MovieTitle *> findMovies(vector<string> movieList);      //make a list of movies for each actor
+
 
 /////////////////////////////////////////////PERSON//////////////////////////////////////////////////////
 class Person{
@@ -45,6 +49,7 @@ private:
     string knownForTitles;
 
     vector<MovieTitle *> titleList;             //list of movies they appear in
+    vector<string> titleListStr;                //list of titles (string)
     vector<Person *> appearsWithList;           //list of people who appear with them  in other movies
     vector<MovieTitle *> knownForList;          //list of movies they are known for
 
@@ -62,8 +67,10 @@ public:
 		return perStrm;
 	}
 
-    string getID();         
-    void addTitle( MovieTitle * m );
+    string getID(); 
+    string getPrimaryName();        
+    vector<string> addTitleList();
+    void addTitle(MovieTitle * m);
     void addToAppearsWith(Person * p);
     void addToKnownForList(MovieTitle * m);
 
@@ -110,6 +117,9 @@ class MovieTitle
        
         void addActor( Person * p );
         double setScore(double pscore);
+
+        MovieTitle* getAddress();
+        string getTitle();
 
 };
 

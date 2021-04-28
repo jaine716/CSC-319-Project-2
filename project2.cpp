@@ -34,6 +34,7 @@ using namespace std;
 map<string, Person *> mapPersons;       //map of persons
 map<string, MovieTitle *> mapMovies;         //map of movies
 
+
 /////////////////////////////////////////////MAIN///////////////////////////////////////////////////////////////////
 int main(){
 
@@ -41,6 +42,12 @@ int main(){
 
     string id;
     double score = 0;
+    Person * foundActor = nullptr;
+    Person * header = nullptr;
+    vector<MovieTitle *> movieListObj;
+    vector<string> movieList;
+
+    cout << "---------------Project #2---------------" << endl;
 
     loadDataSet();        //un-comment to load data set
 
@@ -48,14 +55,42 @@ int main(){
             <ratings input filename> <score output filename> <person Id= nconst > <level of indirection>*/
 
     //below is temporary
-    cout << "---------------Project #2---------------" << endl;
-  /*  cout << "Enter unique identifier of actor: ";
+    
+    cout << "Enter unique identifier of actor: ";
     cin >> id;
 
-    score = calculateScore(id);
+    //find all movies actor apears in
+    auto result = mapPersons.find(id);
+    auto h = mapPersons.find("nconst");
+    
+    header = h->second;
+    foundActor = result->second;
 
-    cout << "The score for this actor is: " << score << endl;
-*/
+    movieList = result->second->addTitleList(); 
+
+    cout << "\n\nThe actor's name is: " << result->second->getPrimaryName() << endl;
+    cout << endl << *header << endl;
+    cout << *foundActor << endl;
+    cout << "\tMovie list for " << result->second->getPrimaryName() << ": " << endl;
+  
+    cout << endl;
+
+    //make a vector of MovieTitle that the actor appears in
+    movieListObj = findMovies(movieList);
+
+    for(auto it = movieListObj.begin(); it != movieListObj.end(); ++it){
+        int i = 0;
+        cout << "\t" << *(movieListObj[i]);
+        i++;
+    }
+    cout << endl;
+
+    //find actors in movieListObj
+
+ /*   score = calculateScore(id);
+
+    cout << "The score for this actor is: " << score << endl;*/
+
     /*Producing the output:
 
     1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
@@ -110,14 +145,14 @@ void loadMovie(){
             mapMovies.insert( pair<string, MovieTitle *> (m->getID(), m));
 
             //print object m and all of it's elements
-            cout << *m;
+            //cout << *m;
             result.clear();
 		}
 
 		inFile.close();
-        cout << "\nMovies Loaded Successfully" << endl;
+        cout << "Movies Loaded Successfully" << endl;
         //print map of values
-     /*   for(auto it = mapMovies.begin(); it != mapMovies.end(); ++it){
+/*        for(auto it = mapMovies.begin(); it != mapMovies.end(); ++it){
             cout << it->first << " * " << it->second << endl;
         }   */
 	}
@@ -161,13 +196,13 @@ void loadPerson(){
             mapPersons.insert( pair<string, Person *> (p->getID(), p));
 
             //print object p and all of it's elements
-            cout << *p;
+            //cout << *p;
             result.clear();
             
 		}
 
 		inFile.close();
-        cout << "\nNames Loaded Successfully" << endl;
+        cout << "Names Loaded Successfully" << endl;
         //print map of values
     /*    for(auto it = mapPersons.begin(); it != mapPersons.end(); ++it){
             cout << it->first << " * " << it->second << endl;
@@ -226,13 +261,13 @@ void loadPrincipal(){
         }
 
         //print out list of principals
-        cout << *pr;
+        //cout << *pr;
         result.clear();
     
         } //endwhile
 
         inFile.close();
-        cout << "\nLoaded Principals Successfully" << endl;
+        cout << "Loaded Principals Successfully" << endl;
     } //endif
     else{
         cout << "Unable to open principals file." << endl;
@@ -271,11 +306,11 @@ void loadRatings(){
             
 
             //print object p and all of it's elements
-            cout << *r;
+            //cout << *r;
             result.clear();
 		}
 		inFile.close();
-        cout << "\nLoaded Ratings Successfully" << endl;
+        cout << "Loaded Ratings Successfully" << endl;
 	}
     else{
         cout << "Unable to open ratings file." << endl;
@@ -294,4 +329,21 @@ void loadDataSet(){
     loadRatings();
 }
 
+/////////////////////////////////Find List of Movies for Each Actor//////////////////////////////////////////////////
+vector<MovieTitle *> findMovies(vector<string> movieList){
+
+    vector<MovieTitle *> movieListObj;
+    string tId;
+    MovieTitle * result = nullptr;
+
+    for(auto it = movieList.begin(); it != movieList.end(); ++it){
+        tId = (*it);
+        auto mov = mapMovies.find(tId);
+        result = mov->second;
+        movieListObj.push_back(result);
+    }
+
+    return movieListObj;
+    
+}
 
