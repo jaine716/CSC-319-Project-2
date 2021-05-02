@@ -48,6 +48,10 @@ string Person::getPrimaryName(){
     return primaryName;
 }
 
+string Person::getKnownForTitles(){
+    return knownForTitles;
+}
+
 vector<string> Person::addTitleList() {
 
         string titlestr = this->knownForTitles;
@@ -67,12 +71,19 @@ void Person::addTitle(MovieTitle * m) {
     titleList.push_back(m);
 }
 
-void Person::addToAppearsWith(Person * p){
-        appearsWithList.push_back(p);
-    }
+vector<MovieTitle *> Person::getTitleList(){    //returns title list (vector of MovieTitles*)
+    return titleList;
+}
 
-void Person::addToKnownForList(MovieTitle * m){
-        knownForList.push_back(m);
+vector<string> Person::getTitleListStr(){       //returns title list IDs (vector of strings)
+    vector<string> titleListVec;
+    //cout << " | ";
+    for(auto it = titleList.begin(); it != titleList.end(); ++it){
+        titleListVec.push_back((*it)->getID());
+        //cout << (*it)->getID() << " ";
     }
+    return titleListVec;
+}
+
 
 

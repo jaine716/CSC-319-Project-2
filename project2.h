@@ -26,16 +26,26 @@ class Rating;
 
 
 //function prototypes
-void loadDataSet();                     //load the data set
-
+void loadDataSet();         //load all data sets
 void loadMovie();           //load movies
 void loadPerson();          //load people
 void loadPrincipal();       //load principals
+void loadRatings();         //load ratings
 
 double calculateScore(string id);       //calculate score of actor
 
-vector<MovieTitle *> findMovies(vector<string> movieList);      //make a list of movies for each actor
+vector<MovieTitle *> findMovies(vector<string> movieList);      //make a vector of MovieTitle for each actor (from vector of tID strings)
 
+//operator overload - prints out all elements of a vector of type T
+template <typename T>
+std::ostream & operator << (std::ostream & os, const std::vector<T> & vect)
+{
+    for(auto elem : vect)
+    {
+        os << *elem << "\t";
+    }
+    return os;
+}
 
 /////////////////////////////////////////////PERSON//////////////////////////////////////////////////////
 class Person{
@@ -50,30 +60,28 @@ private:
 
     vector<MovieTitle *> titleList;             //list of movies they appear in
     vector<string> titleListStr;                //list of titles (string)
-    vector<Person *> appearsWithList;           //list of people who appear with them  in other movies
-    vector<MovieTitle *> knownForList;          //list of movies they are known for
 
 public:
     
     Person(string pId, string pName, string bYear, string dYear, string pProf, string knownFor);    //constructor prototype
     virtual ~Person();      //destructor prototype
 
-    //function prototypes
-    void write(ostream& perStrm);
-
+    //operator overload
     friend ostream& operator<< (ostream&perStrm, Person obj){		//friend means you can access the private members of the class
 
 		obj.write(perStrm);
 		return perStrm;
 	}
 
+    //function prototypes
+    void write(ostream& perStrm);
     string getID(); 
-    string getPrimaryName();        
+    string getPrimaryName(); 
+    string getKnownForTitles();       
     vector<string> addTitleList();
     void addTitle(MovieTitle * m);
-    void addToAppearsWith(Person * p);
-    void addToKnownForList(MovieTitle * m);
-
+    vector<MovieTitle *> getTitleList();
+    vector<string> getTitleListStr();
 };
 
 ////////////////////////////////////////////////MOVIE/////////////////////////////////////////////////////
@@ -91,7 +99,6 @@ class MovieTitle
         string genres;
 
         double score = 0.0;
-        vector<Principals *> principalList;
         vector<Person *> actorList;
 
     protected:
@@ -103,21 +110,19 @@ class MovieTitle
         MovieTitle(string tId, string tType, string pTitle, string oTitle, string isAd, string sYear, string eYear, string rtMin, string genr);
         virtual ~MovieTitle();       //destructor prototype
 
-        void write(ostream& movStrm);
+        //operator overload
         friend ostream& operator<< (ostream&movStrm, MovieTitle obj){		//friend means you can access the private members of the class
+            obj.write(movStrm);
+            return movStrm;
+        }
 
-		obj.write(movStrm);
-		return movStrm;
-	}
+        //function prototypes
         string getID();
-        double getRating ();
-        
-        void getPrincipals (Principals * prin);
-        void getAllActors (Person * actor);
-       
+        double getRating();
+        void write(ostream& movStrm);
+        vector<Person *> getAllActors();
         void addActor( Person * p );
         double setScore(double pscore);
-
         MovieTitle* getAddress();
         string getTitle();
 
@@ -138,11 +143,8 @@ class Principals {
     
     public:
 
-    Principals(string t, string order, string n, string cat, string jb, string chars);      //constructor
-    virtual ~Principals();          //destructor
-
-
-    void write(ostream& prinStrm);
+    Principals(string t, string order, string n, string cat, string jb, string chars);      //constructor prototype
+    virtual ~Principals();          //destructor prototype
 
     // << operator overload
     friend ostream& operator<< (ostream&prinStrm, Principals obj){		//friend means you can access the private members of the class
@@ -150,21 +152,12 @@ class Principals {
 		return prinStrm;
 	}
 
-    void setPrinCharsActor(string n);
-    void setPrinCharsMovie(string t);
-
-    void setNconst(string n);
-    void setTconst(string t);
-    void setCategory(string c);
-
+    //function prototypes
+    void write(ostream& prinStrm);
     string getNconst();
     string getTconst();
     string getCategory();
 
-    void addPrincipal(Principals * principal);
-
-    string getPrinCharsActors(string nconst);
-    string getPrinCharsMovies(string tconst);
 };
 
 ////////////////////////////////////////////////RATINGS////////////////////////////////////////////////////
@@ -178,17 +171,17 @@ private:
 
 public:
 
-    Rating(string tId, string avgR, string nVotes);
-    ~Rating();
-
-    void write(ostream& rateStrm);
+    Rating(string tId, string avgR, string nVotes);     //constructor prototype
+    ~Rating();                                          //destructor prototype
 
     // << operator overload
     friend ostream& operator<< (ostream&rateStrm, Rating obj){		//friend means you can access the private members of the class
     	obj.write(rateStrm);
 		return rateStrm;
 	}
-
-        void setRating(string r);
-        string getRating();
+    
+    //function prototypes
+    void write(ostream& rateStrm);
+    void setRating(string r);
+    string getRating();
 };

@@ -38,34 +38,24 @@ MovieTitle::MovieTitle(string tId, string tType, string pTitle, string oTitle, s
 }
 
 void MovieTitle::write(ostream& movStrm){	    //used for operator overload for <<
-	
 	movStrm << tconst << " | " << titleType << " | " << primaryTitle << " | " << originalTitle << " | " << isAdult << " | " << startYear << " | " << endYear << " | " << runtimesMinutes << " | " << genres << endl;
 }
 
 MovieTitle::~MovieTitle(){
-
 }
 
-double MovieTitle::getRating()
-{
-                
+double MovieTitle::getRating(){                
 }
 string MovieTitle::getTitle(){
-
     return primaryTitle;
 }
 
-MovieTitle* MovieTitle::getAddress(){
-    
+MovieTitle* MovieTitle::getAddress(){   
     return this;
 }
 
-void MovieTitle::getPrincipals (Principals * prin){   
-    //principalList.push_back(prin);            
-}
-
-void MovieTitle::getAllActors (Person * actor){
-     //actorList.push_back(actor);           
+vector<Person *> MovieTitle::getAllActors (){
+    return actorList;           
 }
 
 
@@ -73,9 +63,9 @@ void MovieTitle::addActor( Person * p ){
     actorList.push_back( p );
 }
 
-string MovieTitle::getID(){
-        return tconst;
-    }
+string MovieTitle::getID(){     
+    return tconst;
+}
 
 double MovieTitle::setScore(double pscore){
     this->score = pscore;

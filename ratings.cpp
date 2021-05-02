@@ -32,7 +32,6 @@ Rating::~Rating(){
 }
 
 void Rating::write(ostream& rateStrm){	//used by operator overload for <<
-	
 	rateStrm << tconst << " | " << averageRating << " | " << numVotes << " | " << endl;
 }
 
