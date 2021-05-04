@@ -40,6 +40,28 @@ void Rating::setRating(string r){
     averageRating = r;
 }
 
-string Rating::getRating(){
+string Rating::getRating(){    
     return averageRating;
+}
+
+double Rating::getRatingDouble(){
+    
+    try{    
+        double avgRdouble = stod(averageRating);
+        return avgRdouble;
+    }
+    catch(std::exception& e){
+        cout << "Could not convert string to double." << endl;
+    }
+}
+
+double Rating::getNumVotesDouble(){
+    
+    try{    
+        double numVotesDouble = stod(numVotes);
+        return numVotesDouble;
+    }
+    catch(std::exception& e){
+        cout << "Could not convert string to double." << endl;
+    }
 }

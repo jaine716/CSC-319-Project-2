@@ -33,8 +33,11 @@ void loadPrincipal();       //load principals
 void loadRatings();         //load ratings
 
 double calculateScore(string id);       //calculate score of actor
+double scoreMovieList(vector<MovieTitle *> appearsInTot);           //score the list of total movies found
+vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot);     //find all the movies that the actor's associates appear in
+vector<Person *> findAssociatedActors(vector<string> movieList);                //find all of the co-starring actors
 
-vector<MovieTitle *> findMovies(vector<string> movieList);      //make a vector of MovieTitle for each actor (from vector of tID strings)
+vector<MovieTitle *> getMovieObjList(vector<string> movieList);      //make a vector of MovieTitle for each actor (from vector of tID strings)
 
 //operator overload - prints out all elements of a vector of type T
 template <typename T>
@@ -98,8 +101,8 @@ class MovieTitle
         string runtimesMinutes;
         string genres;
 
-        double score = 0.0;
         vector<Person *> actorList;
+        vector<string> GenresListStr;
 
     protected:
       
@@ -122,9 +125,13 @@ class MovieTitle
         void write(ostream& movStrm);
         vector<Person *> getAllActors();
         void addActor( Person * p );
-        double setScore(double pscore);
+        double setScore();
+        //string findTopGenre();
+        double getStartYearDouble();
         MovieTitle* getAddress();
         string getTitle();
+        vector<string> addGenreListVector();
+        double applyGenrePremium(double rating);
 
 };
 
@@ -184,4 +191,6 @@ public:
     void write(ostream& rateStrm);
     void setRating(string r);
     string getRating();
+    double getRatingDouble();
+    double getNumVotesDouble();
 };

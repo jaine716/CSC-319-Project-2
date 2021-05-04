@@ -11,6 +11,7 @@
 #include <memory>
 #include <fstream>   //to do file input & output
 #include <iomanip>  // io formatting
+#include <algorithm>
 
 using std::cout;
 using std::endl;
@@ -67,7 +68,78 @@ string MovieTitle::getID(){
     return tconst;
 }
 
-double MovieTitle::setScore(double pscore){
-    this->score = pscore;
+
+double MovieTitle::setScore(){
+    //this->score = pscore;
 }
 
+double MovieTitle::getStartYearDouble(){
+    
+    try{    
+        double startYearDouble = stod(startYear);
+        return startYearDouble;
+    }
+    catch(std::exception& e){
+        cout << "Could not convert string to double." << endl;
+    }    
+}
+
+vector<string> MovieTitle::addGenreListVector() {
+
+    string genrestr = this->genres;
+    istringstream strstrm(genrestr);
+    string cell;
+
+    while(getline(strstrm, cell, ',')){
+
+        GenresListStr.push_back(cell);
+        //cout << cell << " ";
+    }
+       
+    return GenresListStr;
+}
+
+double MovieTitle::applyGenrePremium(double rating){
+
+    double ratingPremium; 
+    vector<double> rPremVec;
+    string genreStr;
+    if(GenresListStr.size() != 0){   //if the list of genres is not empty
+        for(auto it = GenresListStr.begin(); it!= GenresListStr.end(); ++it){
+            genreStr = (*it);
+        
+            if(genreStr == "Comedy"){
+                ratingPremium = ( rating + (rating * 0.2 ) );
+                rPremVec.push_back(ratingPremium);
+            }
+            else if(genreStr == "Drama"){
+                ratingPremium = (rating * 1.4);
+                rPremVec.push_back(ratingPremium);
+            }
+            else if(genreStr == "Romance"){
+                ratingPremium = (rating - ( rating * 0.2 ) );
+                rPremVec.push_back(ratingPremium);
+            }
+            else if(genreStr == "Horror"){
+                ratingPremium = (rating - ( rating * 0.3 ) );
+                rPremVec.push_back(ratingPremium);
+            }
+            else{
+                ratingPremium = (rating - ( rating * 0 ) );
+                rPremVec.push_back(ratingPremium);
+                //std::cout << "Movie genre not found \n";
+            }
+    
+        
+        } //end for loop
+        ratingPremium = *max_element(rPremVec.begin(), rPremVec.end());
+    }       
+    else{
+            ratingPremium = rating;
+            cout << "\nNo genre list available." << endl;
+        }
+
+    
+    
+return ratingPremium; 
+}
