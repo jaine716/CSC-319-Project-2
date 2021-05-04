@@ -32,8 +32,7 @@ void loadPerson();          //load people
 void loadPrincipal();       //load principals
 void loadRatings();         //load ratings
 
-double calculateScore(string id);       //calculate score of actor
-double scoreMovieList(vector<MovieTitle *> appearsInTot);           //score the list of total movies found
+double scoreMovieList(vector<MovieTitle *> appearsInTot);                       //score the list of total movies found
 vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot);     //find all the movies that the actor's associates appear in
 vector<Person *> findAssociatedActors(vector<string> movieList);                //find all of the co-starring actors
 

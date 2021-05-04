@@ -10,8 +10,8 @@
 #include <array>
 #include <map>
 #include <memory>
-#include <fstream>   //to do file input & output
-#include <iomanip>  // io formatting
+#include <fstream>      //to do file input & output
+#include <iomanip>      // io formatting
 #include <algorithm>
 #include <cassert>
 
@@ -25,39 +25,56 @@ using namespace std;
 
 #include "project2.h"
 
-/*******insert the addresses of the data files on your local machine here:*********/
-
-#define PERSON_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/name.tsv"
-#define MOVIE_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/title.tsv"
-#define PRINCIPAL_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/principals.tsv"
-#define RATING_FILE "/home/jaine/school/CSC319/Project 2/shortInputFiles/ratings.tsv"
-#define OUTPUT_FILENAME "/home/jaine/school/CSC319/Project 2/shortInputFiles/scoreOutput.tsv"
-
 //global variables
 map<string, Person *> mapPersons;               //map of persons
 map<string, MovieTitle *> mapMovies;            //map of movies
 map <string, string> mapPersonsMovieTitles;     //map of movie titles and personIDs
 map <string,Rating *> mapMoviesRatings;         //map of movies and their ratings
 
-//Current Command Line Arguments:
-// ./Project2 <nconst> <level of indirection>
-// e.g. type "./Project2 nm0749008 2" on the command line when you run the program
+//holds the file paths retrieved from the command line
+char * PERSON_FILE;
+char * MOVIE_FILE;
+char * PRINCIPAL_FILE;
+char * RATING_FILE;
+char * OUTPUT_FILENAME;
 
-/////////////////////////////////////////////MAIN///////////////////////////////////////////////////////////////////
+//Current Command Line Arguments:
+/* ./Project2 <name input filename> <title input filename> <principals input filename> <ratings input filename> <score output filename> 
+<person Id= nconst > <level of indirection>
+
+e.g. type (on one line):
+"./Project2 "/home/jaine/school/CSC319/Project 2/shortInputFiles/name.tsv" "/home/jaine/school/CSC319/Project 2/shortInputFiles/title.tsv" 
+"/home/jaine/school/CSC319/Project 2/shortInputFiles/principals.tsv" "/home/jaine/school/CSC319/Project 2/shortInputFiles/ratings.tsv" 
+"/home/jaine/school/CSC319/Project 2/shortInputFiles/scoreOutput.tsv" nm6036532 2" on the command line when you run the program */
+
+
+//////////////////////////////////////////////////////////MAIN///////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[]){
 
     // main body of program here
 
-    assert(argc == 3);      //only run the program if there are 3 command line arguments
+    assert(argc == 8);      //only run the program if there are 8 total command line arguments
 
-/*  const string personFile = argv[1];
-    const string movieFile = argv[2];
-    const string principalFile = argv[3];
-    const string ratingFile = argv[4];
-    const string outFile = argv[5];         */
+    //assign command line arguments to variables
+    PERSON_FILE = argv[1];                          //person file  
+    MOVIE_FILE = argv[2];                           //movie file
+    PRINCIPAL_FILE = argv[3];                       //principal file
+    RATING_FILE = argv[4];                          //rating file
+    OUTPUT_FILENAME = argv[5];                      //output file        
+    string id = argv[6];                            //nconst (person ID)
+    string LOI = argv[7];                           //level of indirection (string)
 
-    string id = argv[1];
-    string levelOfIndirection = argv[2];
+    int levelOfIndirection;
+    
+    //convert LOI from string to int and store in levelOfIndirection
+    try{    
+        levelOfIndirection = stoi(LOI);
+    }
+    catch(std::exception& e){       //if conversion is not successful, handle the exception
+        cout << "Could not convert string to int." << endl;
+    }
+     
+    //declare other variables used in main()
     string actorName;
     double score = 0;
     Person * foundActor = nullptr;
@@ -70,22 +87,14 @@ int main(int argc, char* argv[]){
 
     cout << "---------------Project #2---------------" << endl;
     cout << "Level of Indirection: " << levelOfIndirection << endl;
+
     //load the data sets
     loadDataSet();        
 
-    /*Command line: Project2 <name input filename> <title input filename> <principals input filename> 
-            <ratings input filename> <score output filename> <person Id= nconst > <level of indirection>*/
-
-    //below is temporary
-
- //   char cont = 'y';
- //   while (cont == 'y'){
+    //search for the person
+    auto result = mapPersons.find(id);      
     
- //   cout << "Enter unique identifier of actor: ";
- //   cin >> id;
-    auto result = mapPersons.find(id);
-    
-    if(result != mapPersons.end()){     //if a match is found
+    if(result != mapPersons.end()){         //if a match is found
         auto h = mapPersons.find("nconst");
         
         header = h->second;
@@ -104,6 +113,12 @@ int main(int argc, char* argv[]){
 
         //make a vector of MovieTitle that the actor appears in 
         movieListObj = getMovieObjList(movieList);
+
+        //remove duplicates and sort
+        std::sort(movieListObj.begin(),movieListObj.end());
+        auto dup = std::unique(movieListObj.begin(), movieListObj.end());
+        movieListObj.erase(dup, movieListObj.end());
+
         cout << "\t" << movieListObj;
         cout << "\n" << actorName << " appears with: \n" << endl;
      
@@ -141,23 +156,12 @@ int main(int argc, char* argv[]){
         cout << "Actor's name not found." << endl;
     }
 
-        
- /*   score = calculateScore(id);
-
-    cout << "The score for this actor is: " << score << endl;*/
-
     /*Producing the output:
 
     1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
     2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
     In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
     The output must be sorted by ascending nconst. */
-
-    //cout << "Do you wish to search for another person?  [type 'y' for yes, 'n' for no]: ";
-    //cin >> cont;
-
-
-    //}     //end while
 
 }
 
@@ -272,14 +276,6 @@ double scoreMovieList(vector<MovieTitle *> appearsInTot){
         }
     }
     cout << "\n\tSum : " << score << endl << endl;
-    return score;
-}
-
-
-/////////////////////////////////////////CALCULATE SCORE////////////////////////////////////////////////////////////////
-double calculateScore(string id){
-    double score = 0;
-
     return score;
 }
 
