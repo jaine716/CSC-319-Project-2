@@ -68,9 +68,9 @@ int main(int argc, char* argv[]){
     
     //convert LOI from string to int and store in levelOfIndirection
     try{    
-        levelOfIndirection = stoi(LOI);
+        levelOfIndirection = stoi(LOI);     //stoi() is a function which converts a string to int
     }
-    catch(std::exception& e){       //if conversion is not successful, handle the exception
+    catch(std::exception& e){               //if conversion is not successful, handle the exception
         cout << "Could not convert string to int." << endl;
     }
      
@@ -151,21 +151,26 @@ int main(int argc, char* argv[]){
         score = scoreMovieList(movieListObj) + scoreMovieList(appearsInTot);
         cout << "Total Score: " << score << endl;
 
+        /*Producing the output:
+
+        1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
+        2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
+        In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
+        The output must be sorted by ascending nconst. */
+
+        /************* create the output file *************/
+
+        generateOutputFile(appearsWithTot);       
+
     }
     else{
-        cout << "Actor's name not found." << endl;
+        cout << "Actor's name not found." << endl;      //print message if no actor's name is found
     }
 
-    /*Producing the output:
+}   //end main
 
-    1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
-    2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
-    In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
-    The output must be sorted by ascending nconst. */
 
-}
-
-/////////////////////////////////Find List of Movies for Each Actor//////////////////////////////////////////////////
+/////////////////////////////////Find List of Movies for Each Actor From Vector of Strings //////////////////////////////////////////////////
 vector<MovieTitle *> getMovieObjList(vector<string> movieList){
 
     vector<MovieTitle *> movieListObj;
@@ -277,6 +282,34 @@ double scoreMovieList(vector<MovieTitle *> appearsInTot){
     }
     cout << "\n\tSum : " << score << endl << endl;
     return score;
+}
+
+//////////////////////////////////////// Generate the Output File ///////////////////////////////////////////////////
+void generateOutputFile(vector<Person *> appearsWithTot){
+    
+    fstream out_file;                   //filestream for the output file
+        vector<string> personScores;        //holds each line that will go into the output file (personID, name, and score - tab-delimeted)
+
+        out_file.open(OUTPUT_FILENAME, ios::out);           //open the output file
+        if(!out_file){
+            cout << "Unable to create the output file." << endl;        //print message if unable to open the output file
+        }
+        else{       //if able to open the output file
+
+            //create a vector of <string> which is the person'd ID concatenated with their name and score, separated by tabs
+            for (auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
+                personScores.push_back((*it)->getID() + "\t" + (*it)->getPrimaryName() + "\t" + "person_score" + "\n");
+            }
+
+            //sort the vector<string> personScores by ascending order (nconst)
+            std::sort(personScores.begin(),personScores.end());
+
+            //write each element of personScores (line of information) to the output file
+            for (auto it = personScores.begin(); it != personScores.end(); ++it){
+                out_file << *it;
+            }
+            cout << "Output file created." << endl;     //print message to confirm creation of the output file
+        }
 }
 
 /////////////////////////////////////////LOADING THE DATA////////////////////////////////////////////////////////////////

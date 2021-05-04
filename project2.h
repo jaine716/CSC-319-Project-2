@@ -35,6 +35,7 @@ void loadRatings();         //load ratings
 double scoreMovieList(vector<MovieTitle *> appearsInTot);                       //score the list of total movies found
 vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot);     //find all the movies that the actor's associates appear in
 vector<Person *> findAssociatedActors(vector<string> movieList);                //find all of the co-starring actors
+void generateOutputFile(vector<Person *> appearsWithTot);                       //generates the output file
 
 vector<MovieTitle *> getMovieObjList(vector<string> movieList);      //make a vector of MovieTitle for each actor (from vector of tID strings)
 
