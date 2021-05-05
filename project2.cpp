@@ -30,6 +30,7 @@ map<string, Person *> mapPersons;               //map of persons
 map<string, MovieTitle *> mapMovies;            //map of movies
 map <string, string> mapPersonsMovieTitles;     //map of movie titles and personIDs
 map <string,Rating *> mapMoviesRatings;         //map of movies and their ratings
+double score;                                   //holds the score of the actor
 
 //holds the file paths retrieved from the command line
 char * PERSON_FILE;
@@ -72,11 +73,35 @@ int main(int argc, char* argv[]){
     }
     catch(std::exception& e){               //if conversion is not successful, handle the exception
         cout << "Could not convert string to int." << endl;
-    }
-     
-    //declare other variables used in main()
+    }   
+
+    score = 0;
+
+    cout << "---------------Project #2---------------" << endl;
+    cout << "Level of Indirection: " << levelOfIndirection << endl;
+
+    //load the data sets
+    loadDataSet();
+
+    //score the actor
+    scorePerson(id, levelOfIndirection);        
+
+    /*Producing the output:
+
+    1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
+    2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
+    In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
+    The output must be sorted by ascending nconst. */
+
+
+}   //end main
+
+////////////////////////////////////// Get Score for an Actor to the Nth Level of Indirection //////////////////////////////////////////////////////
+
+double scorePerson(string id, int levelOfIndirection){
+
+    //declare variables used in scorePerson
     string actorName;
-    double score = 0;
     Person * foundActor = nullptr;
     Person * header = nullptr;
     vector<MovieTitle *> movieListObj;
@@ -85,44 +110,41 @@ int main(int argc, char* argv[]){
     vector<Person *> appearsWithTot;
     vector<MovieTitle*> appearsInTot;
 
-    cout << "---------------Project #2---------------" << endl;
-    cout << "Level of Indirection: " << levelOfIndirection << endl;
-
-    //load the data sets
-    loadDataSet();        
-
     //search for the person
     auto result = mapPersons.find(id);      
     
-    if(result != mapPersons.end()){         //if a match is found
-        auto h = mapPersons.find("nconst");
+    if(result != mapPersons.end()){             //if a match is found
+        auto h = mapPersons.find("nconst");     //this finds the header line
         
-        header = h->second;
-        foundActor = result->second;
+        header = h->second;                 //the first line of the file has the header (nconst, primaryName, knownForTitles, etc.)
+        foundActor = result->second;        //this returns the Person object (actor information) if the actor is found
 
-        movieList = result->second->getTitleListStr(); 
-        actorName = result->second->getPrimaryName();
+        movieList = result->second->getTitleListStr();      //this is the list of their movies, all in one string
+        actorName = result->second->getPrimaryName();       //this is the name of the actor (string)
 
-        cout << "\n\nThe actor's name is: " << actorName  << endl;
-        cout << endl << "\t" << *header << endl;
-        cout << "\t" << *foundActor << endl;
+        cout << "\n\nThe actor's name is: " << actorName  << endl;      //print the actor's name
+        cout << endl << "\t" << *header << endl;                        //print the header
+        cout << "\t" << *foundActor << endl;                            //print the actor's information
 
-        /********** find all movies actor apears in **********/
+    /********** find all movies actor apears in **********/
+        
         cout << "Movie list for " << actorName  << ": " << endl; 
         cout << endl;
-
+        
         //make a vector of MovieTitle that the actor appears in 
-        movieListObj = getMovieObjList(movieList);
+        movieListObj = getMovieObjList(movieList);                  //take the list of movies (all one string) and turn it into a vector of Movie objects
 
         //remove duplicates and sort
-        std::sort(movieListObj.begin(),movieListObj.end());
-        auto dup = std::unique(movieListObj.begin(), movieListObj.end());
-        movieListObj.erase(dup, movieListObj.end());
+        std::sort(movieListObj.begin(),movieListObj.end());                 //sort
+        auto dup = std::unique(movieListObj.begin(), movieListObj.end());   //find the duplicate
+        movieListObj.erase(dup, movieListObj.end());                        //erase the duplicate
 
         cout << "\t" << movieListObj;
-        cout << "\n" << actorName << " appears with: \n" << endl;
-     
-        //********** get all the actors that appear in movies alongside actor being searched for ***********/
+
+        if(levelOfIndirection != 0)     //don't print appearsWith if on the last level of indirection
+            cout << "\n" << actorName << " appears with: \n" << endl;
+             
+    /********** get all the actors that appear in movies alongside actor being searched for ***********/           
         appearsWithTot = findAssociatedActors(movieList);
 
         //remove if they appear with themselves
@@ -132,45 +154,39 @@ int main(int argc, char* argv[]){
                 appearsWithTot.erase(it);
                 it--;        //don't point to something that no longer exists     
             }
-        }      
-        cout << "\t" << appearsWithTot;
+        }
+
+        if(levelOfIndirection != 0)     //don't print appearsWith if on the last level of indirection
+            cout << "\t" << appearsWithTot;
         cout << endl;
 
-        /********** get all the movies that those associated actors appeared in ***********/
-        if(appearsWithTot.begin() != appearsWithTot.end()){
-            cout << "\n" << actorName << "'s associates appear in the following titles: \n" << endl;
-            appearsInTot = findAssociateMovies(appearsWithTot);
+    /************ Score the Movies ********************/
+        cout << "Score for the Actor's Movies:\n" << endl;
+
+        score += (scoreMovieList(movieListObj, true));          //calculate the scores of the list of movies
+
+        cout << "Total Score: " << score << endl;       
+        cout << "level of indirection: " << levelOfIndirection << endl;
+        
+    /************* create the output file *************/
+        if(levelOfIndirection == 1){                //generate the file on 2nd to last iteration (otherwise the scores are for the next batch of associated actors)
+            generateOutputFile(appearsWithTot);     //generate the output file and go back to main
         }
-        else{
-            cout << "\tCannot search for associated movies (no associated actors were found)." << endl;
-        }
-        cout << "\t" << appearsInTot << endl;
 
-        /********** get scores for each movie in appearsInTot plus the actor's own movies ********/
-        cout << "Score for the Actor's Movies and Score for their Co-Stars' Movies:\n" << endl;
-        score = scoreMovieList(movieListObj) + scoreMovieList(appearsInTot);
-        cout << "Total Score: " << score << endl;
-
-        /*Producing the output:
-
-        1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
-        2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
-        In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
-        The output must be sorted by ascending nconst. */
-
-        /************* create the output file *************/
-
-        generateOutputFile(appearsWithTot);       
-
+       if(levelOfIndirection != 0){
+            //do this process all over again for every actor on the list
+            for(auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
+                scorePerson((*it)->getID(), levelOfIndirection-1);                      //recursive call of scorePerson()
+            }
+        }     
     }
     else{
         cout << "Actor's name not found." << endl;      //print message if no actor's name is found
     }
+    return score;
+}
 
-}   //end main
-
-
-/////////////////////////////////Find List of Movies for Each Actor From Vector of Strings //////////////////////////////////////////////////
+///////////////////////////////// Get List of Movie Objects for Each Actor From Vector of Strings //////////////////////////////////////////////////
 vector<MovieTitle *> getMovieObjList(vector<string> movieList){
 
     vector<MovieTitle *> movieListObj;
@@ -219,7 +235,7 @@ vector<Person *> findAssociatedActors(vector<string> movieList){
     return appearsWithTot;
 }
 
-///////////////////////////////////////////Find Associate's Movies///////////////////////////////////////////////////
+/////////////////////////////////////////// Find Associate's Movies ///////////////////////////////////////////////////
 vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot){
 
     vector<MovieTitle *> appearsInTot;
@@ -247,10 +263,15 @@ vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot){
 
     return appearsInTot;
 }
-/////////////////////////////////////////////Score Movie List////////////////////////////////////////////////////////
-double scoreMovieList(vector<MovieTitle *> appearsInTot){
+///////////////////////////////////////////// Score Movie List ////////////////////////////////////////////////////////
+double scoreMovieList(vector<MovieTitle *> appearsInTot, bool printOutput){
 
-    double score = 0;
+    double scoreLoc = 0;
+
+    //remove duplicates and sort
+    std::sort(appearsInTot.begin(),appearsInTot.end());
+    auto dup = std::unique(appearsInTot.begin(), appearsInTot.end());
+    appearsInTot.erase(dup, appearsInTot.end());
 
     for(auto it = appearsInTot.begin(); it!= appearsInTot.end(); ++it){
 
@@ -264,8 +285,9 @@ double scoreMovieList(vector<MovieTitle *> appearsInTot){
             vector<string> genreList = m->second->addGenreListVector();             //populate the vector of genres
             double scorePremium = m->second->applyGenrePremium(ratingD*numVotes);   //apply the premium based on the highest scoring genre
 
+            if(printOutput == true)
             cout << "\t\tage: " << (2020 - m->second->getStartYearDouble()) << " | ";
-                
+
             if((2020 - m->second->getStartYearDouble()) < 50){            //only award points if the movie is less than 50 years old
                 scorePremium = scorePremium * (100 - (2020 - m->second->getStartYearDouble()))/100;
             }
@@ -273,46 +295,58 @@ double scoreMovieList(vector<MovieTitle *> appearsInTot){
                 scorePremium = 0;
             }
 
-            score+=scorePremium;        //increment the total score
+            scoreLoc+=scorePremium;        //increment the total score
+
+            if(printOutput == true)
             cout << m->second->getTitle() << " | Score: " << scorePremium << endl;
+            
         }
         else{       //if no rating is found
+
+            if(printOutput == true)
             cout << "\t\t" << (*it)->getTitle() << " | rating not found." << endl;
         }
     }
-    cout << "\n\tSum : " << score << endl << endl;
-    return score;
+    if(printOutput == true)
+    cout << "\n\tSum : " << scoreLoc << endl << endl;
+    return scoreLoc;
 }
 
 //////////////////////////////////////// Generate the Output File ///////////////////////////////////////////////////
 void generateOutputFile(vector<Person *> appearsWithTot){
     
     fstream out_file;                   //filestream for the output file
-        vector<string> personScores;        //holds each line that will go into the output file (personID, name, and score - tab-delimeted)
+    vector<string> personScores;        //holds each line that will go into the output file (personID, name, and score - tab-delimeted)
+    double actorScore;
+    string actorScoreStr;
 
-        out_file.open(OUTPUT_FILENAME, ios::out);           //open the output file
-        if(!out_file){
-            cout << "Unable to create the output file." << endl;        //print message if unable to open the output file
+    out_file.open(OUTPUT_FILENAME, ios::out);                       //open the output file
+    if(!out_file){
+        cout << "Unable to create the output file." << endl;        //print message if unable to open the output file
+    }
+    else{       //if able to open the output file
+
+        //create a vector of <string> which is the person'd ID concatenated with their name and score, separated by tabs
+        for (auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
+
+            actorScore = scoreMovieList((*it)->getTitleList(), false);
+            actorScoreStr = to_string(actorScore);
+
+            personScores.push_back((*it)->getID() + "\t" + (*it)->getPrimaryName() + "\t" + actorScoreStr + "\n");
         }
-        else{       //if able to open the output file
 
-            //create a vector of <string> which is the person'd ID concatenated with their name and score, separated by tabs
-            for (auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
-                personScores.push_back((*it)->getID() + "\t" + (*it)->getPrimaryName() + "\t" + "person_score" + "\n");
-            }
+        //sort the vector<string> personScores by ascending order (nconst)
+        std::sort(personScores.begin(),personScores.end());
 
-            //sort the vector<string> personScores by ascending order (nconst)
-            std::sort(personScores.begin(),personScores.end());
-
-            //write each element of personScores (line of information) to the output file
-            for (auto it = personScores.begin(); it != personScores.end(); ++it){
-                out_file << *it;
-            }
-            cout << "Output file created." << endl;     //print message to confirm creation of the output file
+        //write each element of personScores (line of information) to the output file
+        for (auto it = personScores.begin(); it != personScores.end(); ++it){
+            out_file << *it;
         }
+        //cout << "Output file created." << endl;     //print message to confirm creation of the output file
+    }
 }
 
-/////////////////////////////////////////LOADING THE DATA////////////////////////////////////////////////////////////////
+///////////////////////////////////////// LOADING THE DATA ////////////////////////////////////////////////////////////////
 void loadMovie(){
     ifstream inFile;
     vector<string> result;
