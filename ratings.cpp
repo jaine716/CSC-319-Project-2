@@ -31,6 +31,10 @@ Rating::Rating(string tId, string avgR, string nVotes){
 Rating::~Rating(){
 }
 
+Rating::Rating( const Rating &ob){      //copy constructor
+	   
+}
+
 void Rating::write(ostream& rateStrm){	//used by operator overload for <<
 	rateStrm << tconst << " | " << averageRating << " | " << numVotes << " | " << endl;
 }
@@ -65,3 +69,4 @@ double Rating::getNumVotesDouble(){
         cout << "Could not convert string to double." << endl;
     }
 }
+

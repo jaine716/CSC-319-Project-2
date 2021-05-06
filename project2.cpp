@@ -30,7 +30,9 @@ map<string, Person *> mapPersons;               //map of persons
 map<string, MovieTitle *> mapMovies;            //map of movies
 map <string, string> mapPersonsMovieTitles;     //map of movie titles and personIDs
 map <string,Rating *> mapMoviesRatings;         //map of movies and their ratings
-double score;                                   //holds the score of the actor
+map <Person *, double> mapAssociateScore;       //map of associate and their score
+vector<Person *> whoAppearedInSearch;           //keep track of everyone who has contributed to scoring
+double score = 0;                               //holds the score of the actor (searched for on command line)
 
 //holds the file paths retrieved from the command line
 char * PERSON_FILE;
@@ -48,13 +50,29 @@ e.g. type (on one line):
 "/home/jaine/school/CSC319/Project 2/shortInputFiles/principals.tsv" "/home/jaine/school/CSC319/Project 2/shortInputFiles/ratings.tsv" 
 "/home/jaine/school/CSC319/Project 2/shortInputFiles/scoreOutput.tsv" nm6036532 2" on the command line when you run the program */
 
+//Notes on Logic of the Program:
+/*  * An indirection level of 0 will calculate just the score of the actor's movies.  A level of 1 will calculate the score of the actors'
+      movis plus their associates.  Level of 2+ will recursively repeat the process but on each associate, and so on to the nth level of indirection.
+    * This program populates the list of MovieTitles associated with a given actor by scanning BOTH the names.tsv file for knownForTitles
+      AND the principals.tsv file wherever an actor is listed as a principal in a movie.
 
-//////////////////////////////////////////////////////////MAIN///////////////////////////////////////////////////////////////////
+    * Score is a global variable that is the sum of all the scores from each level of indirection (movie score + movies scores of co-stars)
+      and represents the score of the original actor.
+    * The boolean incTotalScore tells the program whether or not the calculation is for the original actor, and whether or not to increment
+      the global score.
+    * aScore is a local variable in main() that is used to populate the output file with the scores of all the people who contributed to the
+      score of the original actor to a level of indirection of 0.
+*/
+////////////////////////////////////////////////////////// MAIN ///////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[]){
 
     // main body of program here
 
-    assert(argc == 8);      //only run the program if there are 8 total command line arguments
+    //only run the program if there are 8 total command line arguments
+    if( argc != 8 ) { 
+        cout << "\nIncorrect number of arguments on command line.  Use format: \n";
+        cout << "\n[executable file name] [file name] [file title] [file principals] [file ratings] [file output] [string id] [int indirection]\n"; exit(-1); 
+    } 
 
     //assign command line arguments to variables
     PERSON_FILE = argv[1];                          //person file  
@@ -75,30 +93,20 @@ int main(int argc, char* argv[]){
         cout << "Could not convert string to int." << endl;
     }   
 
-    score = 0;
-
-    cout << "---------------Project #2---------------" << endl;
-    cout << "Level of Indirection: " << levelOfIndirection << endl;
-
     //load the data sets
     loadDataSet();
 
     //score the actor
-    scorePerson(id, levelOfIndirection);        
+    scorePerson(id, levelOfIndirection, true);       
 
-    /*Producing the output:
-
-    1-The program must produce on the console (cout) the calculated score for the <person Id= nconst >.
-    2-For each person (nconst), which are used to calculate the score of <person Id= nconst >, you must calculate their own score. 
-    In the file <score output filename>, you must output in a tab-delimited format(one per line): <nconst> \t <score>. 
-    The output must be sorted by ascending nconst. */
-
+    //print the score
+    cout << score << endl; 
 
 }   //end main
 
 ////////////////////////////////////// Get Score for an Actor to the Nth Level of Indirection //////////////////////////////////////////////////////
 
-double scorePerson(string id, int levelOfIndirection){
+double scorePerson(string id, int levelOfIndirection, bool incTotalScore){
 
     //declare variables used in scorePerson
     string actorName;
@@ -109,6 +117,8 @@ double scorePerson(string id, int levelOfIndirection){
     vector<Person *> actorList;    
     vector<Person *> appearsWithTot;
     vector<MovieTitle*> appearsInTot;
+    double aScore;                      //aScore is different from score (global), it only applies to 0 level of indirection searches from generateOutputFile()
+
 
     //search for the person
     auto result = mapPersons.find(id);      
@@ -119,108 +129,95 @@ double scorePerson(string id, int levelOfIndirection){
         header = h->second;                 //the first line of the file has the header (nconst, primaryName, knownForTitles, etc.)
         foundActor = result->second;        //this returns the Person object (actor information) if the actor is found
 
+        whoAppearedInSearch.push_back(foundActor);      //keep track of who's appeared in the search
+        
         movieList = result->second->getTitleListStr();      //this is the list of their movies, all in one string
-        actorName = result->second->getPrimaryName();       //this is the name of the actor (string)
-
-        cout << "\n\nThe actor's name is: " << actorName  << endl;      //print the actor's name
-        cout << endl << "\t" << *header << endl;                        //print the header
-        cout << "\t" << *foundActor << endl;                            //print the actor's information
-
+        
     /********** find all movies actor apears in **********/
-        
-        cout << "Movie list for " << actorName  << ": " << endl; 
-        cout << endl;
-        
+
         //make a vector of MovieTitle that the actor appears in 
         movieListObj = getMovieObjList(movieList);                  //take the list of movies (all one string) and turn it into a vector of Movie objects
 
         //remove duplicates and sort
-        std::sort(movieListObj.begin(),movieListObj.end());                 //sort
-        auto dup = std::unique(movieListObj.begin(), movieListObj.end());   //find the duplicate
-        movieListObj.erase(dup, movieListObj.end());                        //erase the duplicate
+        movieListObj = removeDuplicateMovies(movieListObj);
 
-        cout << "\t" << movieListObj;
-
-        if(levelOfIndirection != 0)     //don't print appearsWith if on the last level of indirection
-            cout << "\n" << actorName << " appears with: \n" << endl;
-             
     /********** get all the actors that appear in movies alongside actor being searched for ***********/           
         appearsWithTot = findAssociatedActors(movieList);
 
         //remove if they appear with themselves
         for (auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){        
             if(*it == foundActor){
-                //cout << "duplicate erased" << endl;
+              
                 appearsWithTot.erase(it);
                 it--;        //don't point to something that no longer exists     
             }
+            if(levelOfIndirection == 1)                  //if on 2nd to last level of ind. add the appearsWithTot to whoAppearedInSearch    
+                whoAppearedInSearch.push_back(*it);      //keep track of who's appeared in the search
         }
 
-        if(levelOfIndirection != 0)     //don't print appearsWith if on the last level of indirection
-            cout << "\t" << appearsWithTot;
-        cout << endl;
-
     /************ Score the Movies ********************/
-        cout << "Score for the Actor's Movies:\n" << endl;
 
-        score += (scoreMovieList(movieListObj, true));          //calculate the scores of the list of movies
-
-        cout << "Total Score: " << score << endl;       
-        cout << "level of indirection: " << levelOfIndirection << endl;
+        if(levelOfIndirection == 1)   //generate the score and file on 2nd to last iteration (otherwise the scores are for the next batch of associated actors)
+            whoAppearedInSearch = removeDuplicatePersons(whoAppearedInSearch);
+        
+        if(std::find(whoAppearedInSearch.begin(), whoAppearedInSearch.end(), foundActor) != whoAppearedInSearch.end()){       //only add the score if the actor hasn't already contributed to the total
+            if(incTotalScore == true)                                                //only increment the global score when called from main()
+                score += (scoreMovieList(movieListObj, false));                      //calculate the scores of the list of movies
+            aScore = (scoreMovieList(movieListObj, false));                          //this score is for 0 level of indirection searches only (for output file generation of actor+their co-stars' movies score)
+        }
         
     /************* create the output file *************/
         if(levelOfIndirection == 1){                //generate the file on 2nd to last iteration (otherwise the scores are for the next batch of associated actors)
-            generateOutputFile(appearsWithTot);     //generate the output file and go back to main
+            generateOutputFile(whoAppearedInSearch);     //generate the output file and go back to main
         }
 
        if(levelOfIndirection != 0){
             //do this process all over again for every actor on the list
             for(auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
-                scorePerson((*it)->getID(), levelOfIndirection-1);                      //recursive call of scorePerson()
+                scorePerson((*it)->getID(), levelOfIndirection-1, true);                      //recursive call of scorePerson()           
             }
         }     
     }
     else{
         cout << "Actor's name not found." << endl;      //print message if no actor's name is found
     }
-    return score;
+    return aScore;
 }
 
-///////////////////////////////// Get List of Movie Objects for Each Actor From Vector of Strings //////////////////////////////////////////////////
+///////////////////////////////// Get List of Movie Objects for Each Actor From Vector of Strings /////////////////////////////////
 vector<MovieTitle *> getMovieObjList(vector<string> movieList){
 
     vector<MovieTitle *> movieListObj;
     string tId;
     MovieTitle * result = nullptr;
     
-    for(auto it = movieList.begin(); it != movieList.end(); ++it){
+    for(auto it = movieList.begin(); it != movieList.end(); ++it){      //go through the movie list
             tId = (*it);
-            auto mov = mapMovies.find(tId);
-            if(mov != mapMovies.end()){
-                result = mov->second;
-                movieListObj.push_back(result);
+            auto mov = mapMovies.find(tId);     //find the titleID in the movie map
+            if(mov != mapMovies.end()){         //check if the title was found
+                result = mov->second;           //result is the movie object
+                movieListObj.push_back(result); //push the found movie into the list of movie objects
             }
             else{
                 //cout << "\tMovie not found." << endl;
             }
         }
-    return movieListObj;   
+    return movieListObj;   //return the list of movie objects
 }
 
-/////////////////////////////////////// Find Associated Actors (Co-Stars) /////////////////////////////////////////////
+/////////////////////////////////////// Find Associated Actors (Co-Stars) //////////////////////////////////////////////
 vector<Person *> findAssociatedActors(vector<string> movieList){
 
     vector<Person *> appearsWith;
     vector<Person *> appearsWithTot;
 
-    for(auto it = movieList.begin(); it != movieList.end(); ++it){
+    for(auto it = movieList.begin(); it != movieList.end(); ++it){      //go through the movie list
             
-        //cout << (*it) << " " << movieList.size() << endl;
-        auto appW = mapMovies.find(*it);
+        auto appW = mapMovies.find(*it);    //find the movie in the map
         if(appW != mapMovies.end()){        //if there is a non-zero list of movies
-            appearsWith = appW->second->getAllActors();
-            appearsWithTot.insert(appearsWithTot.end(), appearsWith.begin(), appearsWith.end());
-            //cout << "appears with: " << appearsWith << endl;
+            appearsWith = appW->second->getAllActors();     //find the associated actors
+            appearsWithTot.insert(appearsWithTot.end(), appearsWith.begin(), appearsWith.end());       //insert those actors into the appearsWithTot vector of <Person *>
+            
         }
         else{
             cout << "\tNo associated actors found." << endl;
@@ -228,11 +225,9 @@ vector<Person *> findAssociatedActors(vector<string> movieList){
     }
         
     //remove duplicates
-    std::sort(appearsWithTot.begin(),appearsWithTot.end());
-    auto du = std::unique(appearsWithTot.begin(), appearsWithTot.end());
-    appearsWithTot.erase(du, appearsWithTot.end());       
+    appearsWithTot = removeDuplicatePersons(appearsWithTot);
 
-    return appearsWithTot;
+    return appearsWithTot;  //return the list of actors <Person *>
 }
 
 /////////////////////////////////////////// Find Associate's Movies ///////////////////////////////////////////////////
@@ -246,8 +241,8 @@ vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot){
                     
         auto movW = mapPersons.find((*it)->getID());
         if(movW != mapPersons.end()){
-            appearsIn1 = getMovieObjList(movW->second->addTitleList());      //gets titles from principals (vector of string)
-            appearsIn2 = getMovieObjList(movW->second->getTitleListStr());      //get titles from person (vector of string)
+            appearsIn1 = getMovieObjList(movW->second->addTitleList());                         //gets titles scanned from principals file (vector of string)
+            appearsIn2 = getMovieObjList(movW->second->getTitleListStr());                      //get titles from scanned from names file (vector of string)
             appearsInTot.insert(appearsInTot.end(), appearsIn1.begin(), appearsIn1.end());      //concatenate the vectors
             appearsInTot.insert(appearsInTot.end(), appearsIn2.begin(), appearsIn2.end());
         }
@@ -257,9 +252,7 @@ vector<MovieTitle *> findAssociateMovies(vector <Person *> appearsWithTot){
     }
         
     //remove duplicates and sort
-    std::sort(appearsInTot.begin(),appearsInTot.end());
-    auto dup = std::unique(appearsInTot.begin(), appearsInTot.end());
-    appearsInTot.erase(dup, appearsInTot.end());
+    appearsInTot = removeDuplicateMovies(appearsInTot);
 
     return appearsInTot;
 }
@@ -269,9 +262,7 @@ double scoreMovieList(vector<MovieTitle *> appearsInTot, bool printOutput){
     double scoreLoc = 0;
 
     //remove duplicates and sort
-    std::sort(appearsInTot.begin(),appearsInTot.end());
-    auto dup = std::unique(appearsInTot.begin(), appearsInTot.end());
-    appearsInTot.erase(dup, appearsInTot.end());
+    appearsInTot = removeDuplicateMovies(appearsInTot);
 
     for(auto it = appearsInTot.begin(); it!= appearsInTot.end(); ++it){
 
@@ -329,10 +320,10 @@ void generateOutputFile(vector<Person *> appearsWithTot){
         //create a vector of <string> which is the person'd ID concatenated with their name and score, separated by tabs
         for (auto it = appearsWithTot.begin(); it != appearsWithTot.end(); ++it){
 
-            actorScore = scoreMovieList((*it)->getTitleList(), false);
-            actorScoreStr = to_string(actorScore);
+            actorScore = scorePerson((*it)->getID(), 0, false);     //score in output file = score of the individual who appeared on the list to 0 level of indirection
+            actorScoreStr = to_string(actorScore);                  //convert score (double) to string
 
-            personScores.push_back((*it)->getID() + "\t" + (*it)->getPrimaryName() + "\t" + actorScoreStr + "\n");
+            personScores.push_back((*it)->getID() + "\t" + actorScoreStr + "\n");
         }
 
         //sort the vector<string> personScores by ascending order (nconst)
@@ -342,8 +333,27 @@ void generateOutputFile(vector<Person *> appearsWithTot){
         for (auto it = personScores.begin(); it != personScores.end(); ++it){
             out_file << *it;
         }
-        //cout << "Output file created." << endl;     //print message to confirm creation of the output file
     }
+}
+
+////////////////////////////////////// Remove Duplicate Person Objects From Vector //////////////////////////////////////
+vector<Person *> removeDuplicatePersons(vector<Person *> personList){
+   
+    std::sort(personList.begin(),personList.end());                 //sort
+    auto dup = std::unique(personList.begin(), personList.end());   //check for duplicates
+    personList.erase(dup, personList.end());                        //erase duplicates
+
+    return personList;
+}
+
+///////////////////////////////////////// Remove Duplicate Movie Objects From Vector ////////////////////////////////////
+vector<MovieTitle*> removeDuplicateMovies(vector<MovieTitle *> movieList){
+   
+    std::sort(movieList.begin(),movieList.end());                   //sort
+    auto dup = std::unique(movieList.begin(), movieList.end());     //check for duplicates
+    movieList.erase(dup, movieList.end());                          //erase duplicates
+
+    return movieList;
 }
 
 ///////////////////////////////////////// LOADING THE DATA ////////////////////////////////////////////////////////////////
@@ -390,17 +400,11 @@ void loadMovie(){
             //create map of movies and movie IDs (tconst)
             mapMovies.insert( pair<string, MovieTitle *> (m->getID(), m));
 
-            //print object m and all of it's elements
-            //cout << *m;
             result.clear();
 		}
 
 		inFile.close();
         cout << "Movies Loaded Successfully" << endl;
-        //print map of values
-/*        for(auto it = mapMovies.begin(); it != mapMovies.end(); ++it){
-            cout << it->first << " * " << it->second << endl;
-        }   */
 	}
     else{
         cout << "Unable to open movie file." << endl;
@@ -457,15 +461,13 @@ void loadPerson(){
             istringstream strm(movieList);
             string cell;
 
+            //add those titles to the list of titles (MovieTitle Objects)
             while(getline(strm, cell, ',')){
                 titleList.push_back(cell);
-                //cout << " cell: " << cell << " ";
             }
 
             //get a vector of the movies in knownForTitles
             titleListObj = getMovieObjList(titleList);
-
-            //cout << endl << p->getPrimaryName() << ": ";
 
             int i = 0;
             for(auto it = titleListObj.begin(); it != titleListObj.end(); ++it){
@@ -475,24 +477,14 @@ void loadPerson(){
                     auto itFindMov = mapMovies.find(titleListObj[i]->getID());
                     MovieTitle * m = itFindMov->second;
                     m->addActor(p);
-                    //cout << titleListObj[i]->getTitle() << " " << titleListObj[i]->getID() << " | ";
                 }
                 i++;
             }
-            //cout << endl;
-
-            //print object p and all of it's elements
-            //cout << *p;
-            result.clear();
-            
+            result.clear();    
 		}
 
 		inFile.close();
         cout << "Names Loaded Successfully" << endl;
-        //print map of values
-        /*for(auto it = mapPersonsMovieTitles.begin(); it != mapPersonsMovieTitles.end(); ++it){
-            cout << it->first << " * " << it->second << endl;
-        }   */
 	}
     else{
         cout << "Unable to open name file." << endl;
@@ -537,7 +529,6 @@ void loadPrincipal(){
         Principals * pr = new Principals(t, order, n, cat, jb, chars);
 
         auto itFindPerson = mapPersons.find(n);
-        //if no match found? do something
 
         string str1 = itFindPerson->first;      //1st component of the pair
         Person * p = itFindPerson->second;      //2nd component of the pair
@@ -552,10 +543,6 @@ void loadPrincipal(){
             m->addActor( p );
         }
 
-        
-
-        //print out list of principals
-        //cout << *pr;
         result.clear();
     
         } //endwhile
@@ -611,19 +598,12 @@ void loadRatings(){
 
             if(m != nullptr){
                 mapMoviesRatings.insert( pair<string, Rating *> (m->getID(), r));       //map the movie with it's rating
-                //cout << itFindMovie->first << " * " << itFindMovie->second->getTitle() << endl;
             }
-            //print object r and all of it's elements
-            //cout << *r;
+
             result.clear();
 		}
 		inFile.close();
-        cout << "Loaded Ratings Successfully" << endl;
-
-        //print map of values
-        /*for(auto it = mapMoviesRatings.begin(); it != mapMoviesRatings.end(); ++it){
-            cout << it->first << " * " << it->second->getRatingDouble() << endl;
-        }  */ 
+        cout << "Loaded Ratings Successfully" << endl; 
 	}
     else{
         cout << "Unable to open ratings file." << endl;

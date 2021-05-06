@@ -36,6 +36,10 @@ Person::~Person(){      //destructor
 
 }
 
+Person::Person( const Person &ob){      //copy constructor
+	   
+}
+
 void Person::write(ostream& perStrm){	//used by operator overload for <<
 	
 	perStrm << nconst << " | " << primaryName << " | " << birthYear << " | " << deathYear << " | " << primaryProfession << " | " << knownForTitles << endl;
@@ -52,7 +56,7 @@ string Person::getKnownForTitles(){
     return knownForTitles;
 }
 
-vector<string> Person::addTitleList() {
+vector<string> Person::addTitleList() {         //this takes the string of knownForTitles and makes it into a vector of invidual movie titles
 
         string titlestr = this->knownForTitles;
         istringstream strstrm(titlestr);
@@ -77,10 +81,10 @@ vector<MovieTitle *> Person::getTitleList(){    //returns title list (vector of 
 
 vector<string> Person::getTitleListStr(){       //returns title list IDs (vector of strings)
     vector<string> titleListVec;
-    //cout << " | ";
+    
     for(auto it = titleList.begin(); it != titleList.end(); ++it){
         titleListVec.push_back((*it)->getID());
-        //cout << (*it)->getID() << " ";
+        
     }
     return titleListVec;
 }
